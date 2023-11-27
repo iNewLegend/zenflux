@@ -4,24 +4,31 @@ import ImportPlugin from "eslint-plugin-import";
 
 import * as TSLintParser from "@typescript-eslint/parser";
 
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+
+import * as path from "node:path";
+
+const currentDir = path.dirname( fileURLToPath( import.meta.url ) );
+
+const workspaces = Object.values(
+    JSON.parse( readFileSync( path.resolve( currentDir, "../../package.json" ) ) ).workspaces
+);
+
 /** @type {import('eslint').Linter.FlatConfig[]} */
 export const defaults = [
     {
-        files: [
-            "packages/*/**/*.{ts,tsx}",
-        ],
+        files: workspaces.map( ( p ) => `${ p }/**/*.{ts,tsx}` ),
 
         languageOptions: {
             // Specifies the parser to use for linting (TypeScript)
-            parser: TSLintParser,
+            "parser": TSLintParser,
 
             parserOptions: {
-                ecmaVersion: "latest",
-                sourceType: "module",
+                "ecmaVersion": "latest",
+                "sourceType": "module",
 
-                project: [
-                    "packages/*/tsconfig.eslint.json",
-                ]
+                "project": workspaces.map( ( p ) => `${ p }/tsconfig.eslint.json` ),
             },
         },
 
@@ -45,9 +52,7 @@ export const defaults = [
                     // Always try to use types when resolving
                     "alwaysTryTypes": true,
 
-                    "project": [
-                        "packages/*/tsconfig.eslint.json",
-                    ]
+                    "project": workspaces.map( ( p ) => `${ p }/tsconfig.eslint.json` ),
                 },
                 // Use Node.js module resolution strategy
                 "node": true,
@@ -102,18 +107,18 @@ export const defaults = [
                 "error",
                 {
                     // Define custom import groupings
-                    "pathGroups": [
-                        {
-                            "pattern": "@internal/**",
-                            "group": "internal",
-                            "position": "after",
-                        },
-                        {
-                            "pattern": "@zenflux/**",
-                            "group": "parent",
-                            "position": "after",
-                        },
-                    ],
+                    // "pathGroups": [
+                    //     {
+                    //         "pattern": "@internal/**",
+                    //         "group": "internal",
+                    //         "position": "after",
+                    //     },
+                    //     {
+                    //         "pattern": "@zenflux/**",
+                    //         "group": "parent",
+                    //         "position": "after",
+                    //     },
+                    // ],
                     // Define the order of import groups
                     "groups": [
                         "builtin",
@@ -130,6 +135,13 @@ export const defaults = [
                     "newlines-between": "always-and-inside-groups",
                     // Allow multiple imports from the same module
                     "distinctGroup": false,
+
+                    // "alphabetize": {
+                    //     // "order": "asc",
+                    //     // "caseInsensitive": true,
+                    //     "orderImportKind": "asc"
+                    // },
+                    "warnOnUnassignedImports": true,
                 },
             ],
             // Enforce Unix line endings
@@ -184,9 +196,12 @@ export const defaults = [
             "**/*.js",
             "**/*.d.ts",
 
+            // "**/zenflux.*.config.ts",
+
             "**/dist/**",
             "**/bin/**",
             "**/node_modules/**",
+            "**/.backups/**",
         ],
     }
 ];
@@ -196,7 +211,7 @@ export const tests = [
     {
         ignores: [
             "**/eslint.config.*",
-            "**/jest.config.ts",
+            "**/*jest.config.ts",
         ],
     },
     {
@@ -218,4 +233,3 @@ export const tests = [
         },
     }
 ];
-

@@ -67,6 +67,7 @@ export abstract class CommandBuildBase extends CommandConfigBase {
     }
 
     protected getRollupConfig( config: IZConfigInternal ) {
+        // TODO: Use helper function if its used in more than one place
         return this.rollupConfig[ config.path + "-" + config.outputName ];
     }
 

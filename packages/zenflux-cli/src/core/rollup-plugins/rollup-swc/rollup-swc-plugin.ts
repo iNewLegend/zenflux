@@ -18,6 +18,9 @@ export default function zRollupSwcPlugin( args: Required<IPluginArgs> ): Plugin 
         name: "z-rollup-swc-plugin",
 
         transform( source, id ) {
+            // TODO: Does rollup already have a cache?
+            // Find answer ^
+
             if ( cache.has( id ) ) {
                 return cache.get( id )!;
             }

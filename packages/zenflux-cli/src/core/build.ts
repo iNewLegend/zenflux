@@ -105,30 +105,7 @@ async function zRollupBuildInWorker( rollupOptions: RollupOptions[], options: TZ
     } );
 }
 
-export async function zRollupBuild( rollupOptions: RollupOptions[] | RollupOptions, options: TZBuildOptions ) {
-    if ( ! Array.isArray( rollupOptions ) ) {
-        rollupOptions = [ rollupOptions ];
-    }
-
-    let buildPromise;
-
-    // No threads.
-    if ( ! options.thread && 0 !== options.thread ) {
-        buildPromise = Promise.all(
-            rollupOptions.map( ( rollupOptions ) => rollupBuildInternal( rollupOptions, options ) )
-        );
-    } else {
-        buildPromise = zRollupBuildInWorker( rollupOptions, options );
-    }
-
-    buildPromise.then( () => {
-        options.config.onBuilt?.();
-    } );
-
-    return buildPromise;
-}
-
-function zInitWorkerWork() {
+function zRollupCreateBuildWorker() {
     if ( ! workerData.options.thread && 0 !== workerData.options.thread ) {
         throw new Error( "Thread options not found." );
     }
@@ -196,6 +173,29 @@ function zInitWorkerWork() {
     } );
 }
 
+export async function zRollupBuild( rollupOptions: RollupOptions[] | RollupOptions, options: TZBuildOptions ) {
+    if ( ! Array.isArray( rollupOptions ) ) {
+        rollupOptions = [ rollupOptions ];
+    }
+
+    let buildPromise;
+
+    // No threads.
+    if ( ! options.thread && 0 !== options.thread ) {
+        buildPromise = Promise.all(
+            rollupOptions.map( ( rollupOptions ) => rollupBuildInternal( rollupOptions, options ) )
+        );
+    } else {
+        buildPromise = zRollupBuildInWorker( rollupOptions, options );
+    }
+
+    buildPromise.then( () => {
+        options.config.onBuilt?.();
+    } );
+
+    return buildPromise;
+}
+
 if ( workerData?.zCliWorkPath ) {
-    zInitWorkerWork();
+    zRollupCreateBuildWorker();
 }

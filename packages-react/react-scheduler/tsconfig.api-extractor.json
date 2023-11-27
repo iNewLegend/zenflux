@@ -1,0 +1,14 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "paths": {
+            "@z-react-scheduler/*": [
+                "./dist/src/*"
+            ]
+        }
+    },
+    "include": [
+        "dist/**/*.d.ts"
+    ],
+    "exclude": []
+}

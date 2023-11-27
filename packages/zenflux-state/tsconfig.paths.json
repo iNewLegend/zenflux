@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+        "outDir": "dist",
+        "baseUrl": "./",
+        "paths": {
+            "@z-state/*": [
+                "src/*"
+            ]
+        }
+    },
+    "include": [
+		"src/**/*.ts"
+	],
+	"exclude": [
+		"node_modules",
+		"dist"
+	]
+}

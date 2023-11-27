@@ -1,0 +1,29 @@
+{
+    "name": "@zenflux/react-dom",
+    "version": "18.2.0",
+    "description": "React package for working with the DOM.",
+    "main": "index.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/facebook/react.git",
+        "directory": "packages/react-dom"
+    },
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/facebook/react/issues"
+    },
+    "homepage": "https://reactjs.org/",
+    "dependencies": {
+        "loose-envify": "^1.1.0",
+        "scheduler": "^0.23.0"
+    },
+    "browser": {
+        "./server.js": "./server.browser.js",
+        "./static.js": "./static.browser.js"
+    },
+    "browserify": {
+        "transform": [
+            "loose-envify"
+        ]
+    }
+}

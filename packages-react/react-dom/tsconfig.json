@@ -1,0 +1,10 @@
+{
+    // Extends the configuration from "./tsconfig.paths.json"
+    "extends": "./tsconfig.paths.json",
+    // Compiler options
+    "compilerOptions": {
+        "typeRoots": [
+            "../../node_modules/@types"
+        ]
+    }
+}

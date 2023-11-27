@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        "baseUrl": "./",
+        "module": "NodeNext",
+    },
+    "include": [
+        "*.js"
+    ]
+}

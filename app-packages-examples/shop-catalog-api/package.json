@@ -1,0 +1,34 @@
+{
+    "name": "@zenflux/shop-catalog-api",
+    "version": "0.0.0-dev.0",
+    "types": "dist/shop-catalog-api.d.ts",
+    "type": "module",
+    "files": [
+        "dist",
+        "src",
+        "types"
+    ],
+    "scripts": {
+        "@z-catalog-api--test": "jest",
+        "@z-catalog-api--build": "@z-cli @build",
+        "@z-catalog-api--watch": "@z-cli @watch"
+    },
+    "exports": {
+        ".": {
+            "import": "./dist/shop-catalog-api.es.js",
+            "default": "./dist/shop-catalog-api.es.js",
+            "require": "./dist/shop-catalog-api.cjs",
+            "types": "./dist/shop-catalog-api.d.ts"
+        },
+        "./package.json": "./package.json"
+    },
+    "dependencies": {
+        "@zenflux/core": "workspace:*"
+    },
+    "devDependencies": {
+        "@zenflux/cli": "workspace:*"
+    },
+    "publishConfig": {
+        "access": "public"
+    }
+}

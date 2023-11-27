@@ -1,0 +1,10 @@
+{
+    "extends": "./tsconfig.es.json",
+    "compilerOptions": {
+        "outDir": "./dist/",
+        "declaration": true,
+        "declarationMap": true,
+        "sourceMap": true,
+        "noEmitOnError": true
+    }
+}

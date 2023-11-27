@@ -1,0 +1,13 @@
+{
+    // Extends the configuration from "./tsconfig.paths.json"
+    "extends": "./tsconfig.paths.json",
+
+    // Compiler options
+    "compilerOptions": {
+        "moduleResolution": "bundler",
+
+        "strict": true,
+
+        "esModuleInterop": true
+    }
+}

@@ -11,6 +11,7 @@ import ts from "typescript";
 import { console } from "@zenflux/cli/src/modules/console";
 
 import type { TZFormatType } from "@zenflux/cli/src/definitions/zenflux";
+import { workerData } from "node:worker_threads";
 
 const pathsCache: { [ key: string ]: string } = {},
     configCache: { [ key: string ]: ts.ParsedCommandLine } = {},
@@ -195,4 +196,16 @@ export function zTSPreDiagnostics( tsConfig: ts.ParsedCommandLine, useCache = tr
             process.exit( 1 );
         }
     }
+}
+
+function zTSDiagnosticInWorker() {
+
+}
+
+export function zTSCreateDiagnosticWorker() {
+
+}
+
+if ( workerData?.zCliWorkPath ) {
+    zTSCreateDiagnosticWorker();
 }

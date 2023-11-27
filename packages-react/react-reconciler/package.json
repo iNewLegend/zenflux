@@ -1,0 +1,50 @@
+{
+    "name": "@zenflux/react-reconciler",
+    "description": "React package for creating custom renderers.",
+    "version": "0.29.0",
+    "license": "MIT",
+    "types": "dist/zenflux-react-reconciler.d.ts",
+    "main": "dist/zenflux-react-reconciler.es.js",
+    "type": "module",
+    "scripts": {
+        "@z-react-reconciler--test": "@z-jest --selectedProjects react-reconciler",
+        "@z-react-reconciler--build": "bun run @z-cli @build",
+        "@z-react-reconciler--build-constants": "bun run @z-cli @build --config zenflux.constants.config.ts"
+    },
+    "exports": {
+        ".": {
+            "import": "./dist/zenflux-react-reconciler.es.js",
+            "require": "./dist/zenflux-react-reconciler.cjs",
+            "types": "./dist/zenflux-react-reconciler.d.ts"
+        },
+        "./constants": {
+            "import": "./dist/zenflux-react-reconciler.constants.es.js",
+            "require": "./dist/zenflux-react-reconciler.constants.cjs",
+            "types": "./dist/zenflux-react-reconciler.constants.d.ts"
+        },
+        "./src/*": "./src/*.ts",
+        "./package.json": "./package.json"
+    },
+    "peerDependencies": {
+        "react": "^18.2.0"
+    },
+    "dependencies": {
+        "loose-envify": "^1.1.0",
+        "@zenflux/react-scheduler": "workspace:*"
+    },
+    "devDependencies": {
+        "@babel/plugin-transform-react-jsx": "^7.22.15",
+        "@zenflux/react-dom": "workspace:*",
+        "@zenflux/react-x-env": "workspace:*"
+    },
+    "browserify": {
+        "transform": [
+            "loose-envify"
+        ]
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/zenflux/zenflux.git",
+        "directory": "packages/zenflux/react-reconciler"
+    }
+}

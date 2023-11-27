@@ -22,6 +22,7 @@ export interface IPluginArgs {
 export interface IOutputArgs {
     ext?: string;
     format: ModuleFormat;
+    // Remove globals
     globals?: GlobalsOption;
     outputFileName: string;
     outputName: string,

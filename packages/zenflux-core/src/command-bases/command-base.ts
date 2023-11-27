@@ -15,9 +15,6 @@ import type { ICommandArgsInterface, ICommandOptionsInterface, ILogger } from "@
 export abstract class CommandBase extends ObjectBase {
     private static controller: ControllerBase;
 
-    protected args: ICommandArgsInterface = {};
-    protected options: ICommandOptionsInterface = {};
-
     private readonly logger: ILogger;
 
     public static getName() {
@@ -36,7 +33,7 @@ export abstract class CommandBase extends ObjectBase {
         return this.controller;
     }
 
-    public constructor( args: ICommandArgsInterface = {}, options = {} ) {
+    public constructor( protected args: ICommandArgsInterface = {}, protected options: ICommandOptionsInterface = {} ) {
         super();
 
         const type = ( this.constructor as typeof CommandBase );

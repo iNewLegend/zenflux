@@ -1,0 +1,23 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "diagnostics": true,
+        "extendedDiagnostics": true,
+        "resolveJsonModule": true,
+        "module": "esnext",
+        "moduleResolution": "node",
+        "target": "esnext"
+    },
+    "ts-node": {
+        "esm": true,
+        "moduleTypes": {
+            "./**/*": "esm"
+        },
+        "experimentalSpecifierResolution": "node",
+        "experimentalTsImportSpecifiers": true,
+        "require": [
+            "ts-node/register",
+            "tsconfig-paths/register"
+        ]
+    }
+}

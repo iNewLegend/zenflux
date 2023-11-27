@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "bundler",
+        "baseUrl": "./",
+        "paths": {
+            "@z-react-internal-test-utils/*": ["src/*"]
+        }
+    },
+    "include": [
+        "src/**/*.ts",
+        "zenflux*.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist"
+    ]
+}

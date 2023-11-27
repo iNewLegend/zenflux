@@ -1,0 +1,22 @@
+{
+    "$schema": "https://json.schemastore.org/package",
+	"name": "@zenflux/state",
+    "author": "Leonid Vinikov <leonidvinikov@gmail.com> (https://github.com/iNewLegend)",
+    "version": "0.0.0",
+	"module": "dist/es/zenflux-logging.js",
+	"types": "types/index.d.ts",
+    "type": "module",
+    "files": [
+		"dist",
+		"src",
+		"types"
+	],
+	"scripts": {
+        "@z-state--build": "@zenflux-cli @build",
+        "@z-state--dev": "@zenflux-cli:dev @watch"
+    },
+	"devDependencies": {
+		"@zenflux/core": "workspace:*",
+		"@zenflux/cli": "workspace:*"
+    }
+}

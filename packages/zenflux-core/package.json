@@ -17,7 +17,7 @@
         ".": {
             "import": "./dist/zenflux-core.es.js",
             "default": "./dist/zenflux-core.es.js",
-            "require": "./dist/zenflux-core.cjs.js",
+            "require": "./dist/zenflux-core.cjs",
             "types": "./dist/zenflux-core.d.ts"
         },
         "./package.json": "./package.json"

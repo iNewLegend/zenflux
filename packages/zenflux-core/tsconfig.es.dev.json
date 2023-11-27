@@ -9,6 +9,6 @@
 
         "inlineSourceMap": true,
 
-        "noEmitOnError": true
+        "noEmitOnError": false,
     }
 }

@@ -27,10 +27,12 @@ import type { TZFormatType } from "@zenflux/cli/src/definitions/zenflux";
  * Function zRollupGetPlugins(): This function returns an array of Rollup plugins based on the provided arguments.
  */
 export const zRollupGetPlugins = ( args: IPluginArgs, projectPath: string ): OutputPlugin[] => {
+    // TODO: Should plugins be recreated for each format?
     const { extensions, format } = args;
 
     const plugins: Plugin[] = [];
 
+    // TODO I need it?
     plugins.push( nodeResolve( { extensions } ) );
 
     if ( ! args.tsConfig ) {
@@ -55,7 +57,7 @@ export const zRollupGetPlugins = ( args: IPluginArgs, projectPath: string ): Out
  */
 export const zRollupGetOutput = ( args: IOutputArgs, projectPath: string ): OutputOptions => {
     const {
-        ext = "js",
+        ext = "js", // TODO: Remove
         format,
         globals,
         outputName,
@@ -67,10 +69,14 @@ export const zRollupGetOutput = ( args: IOutputArgs, projectPath: string ): Outp
     const outDir = `${ tsConfig.options.outDir || projectPath + "/dist" }`;
 
     const result: OutputOptions = {
+        // TODO: Should be configurable, eg: `{tsOutDir}/{outputFileName}.{format}.{ext}`
+        // file: `${ outDir }/${ outputFileName }.${ format }.${ ext }`,
+
         dir: outDir,
         entryFileNames: `${ outputFileName }.${ format }`,
         chunkFileNames: `${ outputFileName }-[name].${ format }`,
 
+        // inlineDynamicImports: !! tsConfig.options.sourceMap,
         sourcemap: tsConfig.options.sourceMap,
 
         format,

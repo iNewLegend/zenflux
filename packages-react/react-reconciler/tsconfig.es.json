@@ -1,0 +1,8 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "module": "ESNext",
+        /* Currently, there are too much any types in the codebase to enable this. */
+        "noImplicitAny": false
+    }
+}
