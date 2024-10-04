@@ -1,5 +1,10 @@
 {
     "compilerOptions": {
+        "rootDir": ".",
+
+        // Save `.tsbuildinfo` files to allow for incremental compilation of projects.
+        "incremental": true,
+
         "outDir": "dist",
         // Specifies the ECMAScript version to transpile to (e.g., ESNext)
         "target": "ESNext",
