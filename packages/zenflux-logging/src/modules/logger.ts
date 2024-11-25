@@ -5,11 +5,12 @@
  *  - Remove `@ts-ignore`, requires a refactor.
  *  - Add dark/light mode.
  */
+
+import { LoggerBrowserInfra } from "@zenflux/logging/src/modules/logger-browser-infra";
+
+import { reduceCircularReferences } from "@zenflux/logging/src/utils";
+
 import type { interfaces } from "@zenflux/core";
-
-import { LoggerBrowserInfra } from "@z-logging/modules/logger-browser-infra";
-
-import { reduceCircularReferences } from "@z-logging/utils";
 
 export class Logger extends LoggerBrowserInfra implements interfaces.ILogger {
     public static getName() {
@@ -38,7 +39,6 @@ export class Logger extends LoggerBrowserInfra implements interfaces.ILogger {
         this.printFunctionNotify( "db", caller, message );
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     public startsEmpty( caller: interfaces.TCaller ) {
         this.printFunctionNotify( "▶", caller, "", );
     }

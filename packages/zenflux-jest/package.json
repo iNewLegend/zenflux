@@ -13,7 +13,8 @@
     },
     "exports": {
         "./bin/cli.js": "./bin/cli.js",
-        "./definitions": "./src/definitions.ts"
+        "./definitions": "./src/definitions.ts",
+        "./loader": "./src/loader.mjs"
     },
     "devDependencies": {
         "@zenflux/cli": "workspace:*",

@@ -13,6 +13,38 @@ import { zCreateResolvablePromise } from "@zenflux/utils/src/promise";
 import { checksum, verbose } from "./utils.js";
 import { ErrorWithMeta } from "@zenflux/utils/src/error";
 
+
+/**
+ * TODO: Move to `zenflux/utils`.
+ * Parses a single stack trace line into an object with the function name and source.
+ * @param {string} stackTraceLine - A single line from a stack trace.
+ * @returns {{function: string, source: string} | null} The parsed stack trace information, or null if the format is invalid.
+ */
+function parseStackTraceLine(stackTraceLine) {
+    const regex = /^\s*at\s+(.*)\s+\((.*)\)$/;
+    const match = stackTraceLine.trim().match(regex);
+
+    if (match) {
+        const [, functionName, source] = match;
+        return { function: functionName, source: source };
+    }
+
+    return null;
+}
+
+/**
+ * Parses a full stack trace into an array of objects with function names and sources.
+ * @param {string} stackTrace - The full stack trace as a string.
+ * @returns {Array<{function: string, source: string}>} The array of parsed stack trace information.
+ */
+function parseStackTrace(stackTrace) {
+    return stackTrace
+        .split('\n')
+        .map(parseStackTraceLine)
+        .filter(item => item !== null)
+        .reverse()
+}
+
 export class Loaders {
     /**
      * @param {zVm} vm
@@ -64,7 +96,30 @@ export class Loaders {
             options.moduleImportDynamically = dynamicLinkerCallback;
         }
 
-        return this.loadModuleWithOptions( path, type, options );
+        const capture = {};
+        Error.captureStackTrace( capture );
+
+        return this.loadModuleWithOptions( path, type, options ).catch( err => {
+            const deepStack = [];
+
+            if ( err.referencingModule?.identifier ) {
+                deepStack.push( err.referencingModule?.identifier )
+            }
+
+            deepStack.push(
+                ...parseStackTrace( capture.stack ).map( item => `${ item.source } function: ${ item.function }` ));
+
+            const meta = {
+                config: this.vm.config.paths,
+                deepStack
+            }
+
+          if ( err.message ) {
+              throw new ErrorWithMeta( "Error in @zenflux/typescript-vm, While loading module: `" + path + '`', meta, err );
+            }
+
+            throw new ErrorWithMeta( "Error in @zenflux/typescript-vm, While loading module: `" + err.modulePath + '` by `' + err.referencingModule?.identifier + '`', meta );
+        } );
     }
 
     /**
@@ -75,20 +130,24 @@ export class Loaders {
      * @return {Promise<vm.Module|vm.SyntheticModule>}
      */
     async loadModuleWithOptions( path, type, options ) {
+        const { cache = true } = options;
+
         let module;
 
         const id = this.getModuleId( path, type, options );
 
-        /**
-         * TODO: Find better solution for this
-         *
-         * Trying to get from cache if possible, some modules won't get synthesis till their dependencies are loaded
-         * and if they depend one a module that depends on initial load module (circular dependency), it will cause a new module synthesis.
-         */
-        module = await this.getFromCache( id, path, type );
+        if ( cache ) {
+            /**
+             * TODO: Find better solution for this
+             *
+             * Trying to get from cache if possible, some modules won't get synthesis till their dependencies are loaded
+             * and if they depend one a module that depends on initial load module (circular dependency), it will cause a new module synthesis.
+             */
+            module = await this.getFromCache( id, path, type );
 
-        if ( module ) {
-            return module;
+            if ( module ) {
+                return module;
+            }
         }
 
         this.setPrepareCache( id, path, type );
@@ -101,13 +160,13 @@ export class Loaders {
             if ( err.message ) {
                 const deepStack = err.meta?.deepStack || [];
 
-                deepStack.push( ... [
-                    ( "file://" + options.referencingModule?.identifier ) || "",
+                deepStack.push( ...[
                     import.meta.url,
+                    ( "file://" + options.referencingModule?.identifier ) || "",
                 ] );
 
                 err = new ErrorWithMeta( "Error in @zenflux/typescript-vm, While loading module: " + path, {
-                    ... err.meta || {},
+                    ...err.meta || {},
                     config: this.vm.config.paths,
                     deepStack
                 }, err );
@@ -182,7 +241,7 @@ export class Loaders {
 
         const moduleOptions = {
             identifier: path,
-            context: this.vm.sandbox.context
+            context: options.context ?? this.vm.sandbox.context,
         };
 
         switch ( options.moduleType ) {
@@ -256,6 +315,14 @@ export class Loaders {
                         }
                     };
                 }
+
+                this.vm.config.moduleTransformers.forEach( transformer => {
+                    const result = transformer( module, path, sourceModuleOptions );
+
+                    if ( result ) {
+                        module = result.code;
+                    }
+                } );
 
                 vmModule = new vm.SourceTextModule( module, sourceModuleOptions );
                 break;

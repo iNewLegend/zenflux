@@ -1,7 +1,7 @@
 {
     "name": "@zenflux/typescript-vm",
     "description": "A simple VM for running Typescript code in a NodeJS environment, with favor of tsconfig.json",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "type": "module",
     "files": [
         "src",
@@ -24,6 +24,9 @@
 
         "./tsconfig.import-meta.json": "./tsconfig.import-meta.json"
     },
+    "scripts": {
+        "z-typescript-vm--trace-resolution": "tsc --noEmit --traceResolution"
+    },
     "publishConfig": {
         "access": "public"
     },
@@ -36,7 +39,7 @@
         "@zenflux/tsconfig-to-swc": "workspace:*",
         "@zenflux/utils": "workspace:*",
         "@swc/core": "latest",
-        "ts-node": "^10.9.1",
+        "ts-node": "latest",
         "tsconfig-paths": "^4.2.0",
         "source-map-support": "^0.5.21",
         "ajv": "^8.17.1"

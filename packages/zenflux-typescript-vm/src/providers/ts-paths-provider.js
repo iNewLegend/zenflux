@@ -2,13 +2,15 @@ import fs from "node:fs";
 
 import { createMatchPathAsync } from "tsconfig-paths";
 
-import { zIsUnixOrFileProtocolPath } from "@zenflux/utils/src/path.js";
+import { zIsUnixOrFileProtocolPath } from "@zenflux/utils/src/path";
 
 import { ProviderBase } from "./base/provider-base.js";
 
 /**
  * @typedef {ProviderBaseArgs} TsPathsProviderArgs
+ * @property {{[key: string]: Array<string>}} paths
  * @property {string[]} extensions
+ * @property {string} baseUrl
  */
 
 export class TsPathsProvider extends ProviderBase {
@@ -31,6 +33,11 @@ export class TsPathsProvider extends ProviderBase {
     extensions;
 
     /**
+     * @type {string}
+     */
+    baseUrl;
+
+    /**
      * @type {ReturnType<createMatchPathAsync>}
      */
     matchPath;
@@ -42,6 +49,8 @@ export class TsPathsProvider extends ProviderBase {
         super();
 
         this.extensions = args.extensions;
+        this.paths = args.paths;
+        this.baseUrl = args.baseUrl;
     }
 
     initialize() {
@@ -51,7 +60,7 @@ export class TsPathsProvider extends ProviderBase {
          */
         const tsConfigPaths = {};
 
-        Object.entries( this.tsConfig.options.paths ).forEach( ( [ key, value ] ) => {
+        Object.entries( this.paths ).forEach( ( [ key, value ] ) => {
             if ( ! tsConfigPaths[ key ] ) {
                 tsConfigPaths[ key ] = [];
             }
@@ -59,7 +68,7 @@ export class TsPathsProvider extends ProviderBase {
             tsConfigPaths[ key ].push( ... value );
         } );
 
-        this.matchPath = createMatchPathAsync( this.tsConfig.options.baseUrl, this.paths );
+        this.matchPath = createMatchPathAsync( this.baseUrl, this.paths );
     }
 
     async resolve( modulePath, referencingModule, middleware ) {

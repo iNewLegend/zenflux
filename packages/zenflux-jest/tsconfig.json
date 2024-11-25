@@ -1,13 +1,18 @@
 {
     "compilerOptions": {
         "target": "ESNext",
-        "module": "ESNext",
+        "module": "NodeNext",
         "moduleResolution": "NodeNext",
         "esModuleInterop": true,
-        "baseUrl": "./"
+        "baseUrl": "./",
+//        "paths": {
+//            "@jest/globals": [
+//                "src/normalize-globals.js"
+//            ]
+//        }
     },
     "include": [
         "src/*.ts",
         "types"
-    ]
+    ],
 }

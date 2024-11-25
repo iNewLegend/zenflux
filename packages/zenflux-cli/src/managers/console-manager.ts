@@ -5,7 +5,7 @@ import process from "process";
 
 import { Console } from "@zenflux/cli/src/modules/console/console";
 
-import packageJSON from "@zenflux/cli/package.json" assert { type: "json" };
+import packageJSON from "@zenflux/cli/package.json" with { type: "json" };
 
 export class ConsoleManager extends Console {
     private static instance: Console;

@@ -38,6 +38,7 @@ export class TsNodeProvider extends ProviderBase {
      */
     constructor( args ) {
         super( args );
+        process.cwd = () => "/Users/inewlegend/Desktop/zenflux/zenflux/";
 
         /**
          * @type {import("ts-node").RegisterOptions}

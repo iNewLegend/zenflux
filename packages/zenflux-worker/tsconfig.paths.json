@@ -1,10 +1,14 @@
 {
     "compilerOptions": {
         "outDir": "dist",
-        "baseUrl": "./",
+        "baseUrl": "./"
     },
     "include": [
         "src/**/*.ts",
-        "package.json",
+        "package.json"
     ],
+    "exclude": [
+        "node_modules",
+        "dist"
+    ]
 }

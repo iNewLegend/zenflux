@@ -1,15 +1,21 @@
-export function zCreateResolvablePromise(name?: string, autoThrow?: boolean): {
-    promise: Promise<any>;
+export function zCreateResolvablePromise<T>(name?: string, autoThrow?: boolean): {
+    promise: Promise<T>;
     resolve: Function;
     reject: Function;
-    await: Promise<any>;
+    await: Promise<T>;
     isPending: boolean;
     isRejected: boolean;
     isFulfilled: boolean;
-    then: typeof ThenSynthetic;
-    catch: typeof CatchSynthetic;
-    finally: typeof FinallySynthetic;
+    then: DZThenSynthetic<T>;
+    catch: DZCatchSynthetic<T>;
+    finally: DZFinallySynthetic<T>;
 };
+export type DZThenSynthetic = typeof ThenSynthetic;
+export type DZCatchSynthetic = typeof CatchSynthetic;
+export type DZFinallySynthetic = typeof FinallySynthetic;
+/**
+ * @author Leonid Vinikov <leonidvinikov@gmail.com>
+ */
 /**
  * Adds fulfillment and rejection handlers to the promise,
  * and returns a new promise resolving to the return value of the called handler,

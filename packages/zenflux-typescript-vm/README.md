@@ -53,15 +53,11 @@ vm.defineConfig( {
      */
     workspacePath: path.resolve( currentDir, "../../../" ),
 
-    /**
-     * Determines whether to use ts-node compiler or not.
-     */
-    useTsNode: false,
 
     /**
-     * Determines whether to use SWC compiler or not.
+     * Which compiler will be used to transform the files.
      */
-    useSwc: true,
+    useCompiler: "swc",
 
     vmContext: {
         global,

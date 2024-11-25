@@ -17,6 +17,8 @@ import { zWorkspaceGetPackages } from "@zenflux/cli/src/core/workspace";
 
 import { runCLI } from "@jest/core";
 
+import JestRuntime from "jest-runtime";
+
 import type { Config } from "@jest/types";
 import type { DZJestProjectConfigInterface } from "@zenflux/jest/definitions";
 
@@ -161,8 +163,14 @@ function updateJestProjectsConfig( projects: DZJestProjectConfigInterface[] ): (
             p.config.setupFiles = [];
         }
 
+        if ( ! p.config.setupFilesAfterEnv ) {
+            p.config.setupFilesAfterEnv = [];
+        }
+
         // Insert local setup files before the project setup files
         p.config.setupFiles.unshift( path.join( currentDirPath, "setup.js" ) );
+
+        p.config.setupFilesAfterEnv.unshift( path.join( currentDirPath, "setup-after.js" ) );
 
         if ( ! p.config.displayName ) {
             p.config.displayName = p.pkg.getDisplayName();

@@ -9,21 +9,35 @@
         "types"
     ],
     "scripts": {
-        "@z-core--test": "jest",
+        "@z-core--test": "@z-jest",
+        "@z-core--lint": "@z-lint",
+        "@z-core--lint-fix": "@z-lint --fix",
         "@z-core--build": "@z-cli @build",
         "@z-core--dev": "@z-cli @watch --dev"
     },
     "exports": {
         ".": {
-            "import": "./dist/zenflux-core.es.js",
-            "default": "./dist/zenflux-core.es.js",
-            "require": "./dist/zenflux-core.cjs.js",
+            "import": "./dist/zenflux-core.mjs",
+            "default": "./dist/zenflux-core.mjs",
+            "require": "./dist/zenflux-core.cjs",
             "types": "./dist/zenflux-core.d.ts"
         },
+
+        "./src/*": "./src/*.ts",
+        "./src/bases": "./src/bases/index.ts",
+        "./src/command-bases": "./src/command-bases/index.ts",
+        "./src/errors": "./src/errors/index.ts",
+        "./src/interfaces": "./src/interfaces/index.ts",
+
+        "./test/*": "./test/*.ts",
+
         "./package.json": "./package.json"
     },
     "devDependencies": {
-        "@zenflux/cli": "workspace:*"
+        "@zenflux/cli": "workspace:*",
+        "@babel/preset-typescript": "^7.25.7",
+        "@babel/preset-env": "^7.25.7",
+        "@babel/plugin-syntax-import-assertions": "^7.25.7"
     },
     "publishConfig": {
         "access": "public"

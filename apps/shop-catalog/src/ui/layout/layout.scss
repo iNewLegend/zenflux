@@ -1,0 +1,22 @@
+.layout {
+    .layout__content {
+        @apply container;
+        @apply mx-auto;
+        @apply px-4;
+    }
+
+    .layout__overlay {
+        @apply select-none;
+        @apply cursor-pointer;
+    }
+
+    .layout__overlay--invisible {
+        @apply opacity-0;
+        pointer-events: none;
+    }
+
+    .layout__overlay--visible {
+        @apply opacity-100;
+        pointer-events: all;
+    }
+}

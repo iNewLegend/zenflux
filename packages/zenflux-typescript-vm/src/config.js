@@ -40,18 +40,16 @@ export const externalConfig = {
     vmModuleEvaluateOptions: {},
 
     /**
-     * Determines whether to use ts-node compiler or not.
-     *
-     * @param {boolean}
+     * @type {"swc"|"ts-node"}
+
+     * @default {"swc"}
      */
-    useTsNode: false,
+    useCompiler: "swc",
 
     /**
-     * Determines whether to use SWC compiler or not.
-     *
-     * @type {boolean}
+     * @type {Array<(path:string,code:string,options:vm.SourceTextModuleOptions) => { source: import("MagicString").default, transformerId: string} | undefiend>}
      */
-    useSwc: false,
+    moduleTransformers: [],
 
     /**
      * Extensions to use when resolving modules, without a leading dot.
@@ -63,12 +61,10 @@ export const externalConfig = {
  * @param {typeof externalConfig} config
  */
 function validateConfig( config ) {
-    if ( externalConfig.extensions.includes( [ ".ts", ".tsx" ] && ( ! config.useTsNode && ! config.useSwc )) ) {
-        throw new Error( "Must use either `useTsNode` or `useSwc` to transpile typescript" );
-    }
+    const haveValidCompiler = [ "swc", "ts-node" ].includes( config.useCompiler );
 
-    if ( config.useTsNode && config.useSwc ) {
-        throw new Error( "Cannot use both `useTsNode` and `useSwc`" );
+    if ( ! haveValidCompiler ) {
+        throw new Error( `useCompiler must be one of: ${ util.inspect( [ "swc", "ts-node" ] ) }, got: ${ util.inspect( config.useCompiler ) }` );
     }
 }
 

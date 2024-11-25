@@ -94,7 +94,7 @@ if ( ! process.env.Z_RUN_TARGET ) {
     console.log();
     console.log( "Defaults:" );
     console.log( `Z_RUN_TARGET=${ REQUIRED }` );
-    console.log( `Z_RUN_TSCONFIG_PATH="${ nodePath.resolve( projectPaths.dir, TS_CONFIG_JSON ) }"` );
+    console.log( `Z_RUN_TSCONFIG_PATH="${ defaults.tsConfigPath }"` );
     console.log( `Z_RUN_EXTENSIONS=".ts,.json"` );
     process.exit( 0 );
 }

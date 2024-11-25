@@ -1,5 +1,14 @@
 import * as util from "node:util";
 
+// Util.inspect options to ensure the formatting matches your desired output
+const inspectOptions = {
+    depth: null,
+    maxArrayLength: null,
+    breakLength: 80, // Adjust according to your needs
+    compact: false,
+    sorted: true,
+};
+
 /**
  * Generates a new error instance with additional metadata and optional cause.
  *
@@ -13,14 +22,16 @@ class ErrorWithMeta extends Error {
     meta = {};
 
     constructor( message, meta, cause = undefined ) {
-        // Util.inspect options to ensure the formatting matches your desired output
-        const inspectOptions = {
-            depth: null,
-            maxArrayLength: null,
-            breakLength: 80, // Adjust according to your needs
-            compact: false,
-            sorted: true,
-        };
+        if ( meta.deepStack ) {
+            // Remove duplicated items.
+            meta.deepStack = new Set( meta.deepStack )
+                .values()
+                .toArray()
+                // If item not starting with "file://" then add it to the item stack.
+                .map( ( item ) => {
+                    return item.startsWith( "file://" ) ? item : `file://${ item }`;
+                } );
+        }
 
         // Formatted metadata
         let formattedMeta = util.inspect( meta, inspectOptions );
@@ -35,8 +46,12 @@ class ErrorWithMeta extends Error {
         this.meta = meta;
 
         // Some error may come from another context, so we need to add the stack trace.
-        if ( ! ( cause instanceof Error ) && cause.stack ) {
-            this.stack += `\nCaused by: ${ cause.stack }`;
+        if ( cause?.stack ) {
+            if ( ! ( cause instanceof Error ) ) {
+                this.stack += `\nCaused by: ${ cause.stack }`;
+            } else if ( ! this.cause ) {
+                this.cause = cause;
+            }
         }
     }
 }

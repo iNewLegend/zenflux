@@ -51,8 +51,6 @@ export class WorkspaceProvider extends ProviderBase {
 
         this.workspacePath = args.workspacePath;
         this.extensions = args.extensions;
-
-
     }
 
     async initialize() {

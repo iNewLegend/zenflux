@@ -2,8 +2,6 @@
  * @author Leonid Vinikov <leonidvinikov@gmail.com>
  */
 
-import { debug } from "util";
-
 /**
  * Adds fulfillment and rejection handlers to the promise,
  * and returns a new promise resolving to the return value of the called handler,
@@ -22,7 +20,7 @@ import { debug } from "util";
  * @template TResult2 - The type of the value returned from onrejected, or the state of the promise returned from onrejected.
  */
 function ThenSynthetic( name, onfulfilled, onrejected ) {
-};
+}
 
 /**
  * Adds a rejection handler callback to the promise, and returns a new promise
@@ -39,7 +37,6 @@ function ThenSynthetic( name, onfulfilled, onrejected ) {
  * or the state of the promise returned from the onrejected callback.
  */
 function CatchSynthetic( name, onrejected ) {
-    // Implementation here...
 }
 
 /**
@@ -56,8 +53,13 @@ function CatchSynthetic( name, onrejected ) {
  * @template T - The type of the promise.
  */
 function FinallySynthetic( name, onfinally ) {
-    // Implementation here...
 }
+
+/**
+ * @typedef {ThenSynthetic} DZThenSynthetic
+ * @typedef {CatchSynthetic} DZCatchSynthetic
+ * @typedef {FinallySynthetic} DZFinallySynthetic
+ */
 
 /**
  * Create a promise that can be resolved from outside.
@@ -65,17 +67,19 @@ function FinallySynthetic( name, onfinally ) {
  * @param {string} [name=""]
  * @param {boolean} [autoThrow=true]
  *
+ * @template T - The type of the promise.
+ *
  * @return {{
- *     promise: Promise,
+ *     promise: Promise<T>,
  *     resolve: Function,
  *     reject: Function,
- *     await: Promise;
+ *     await: Promise<T>;
  *     isPending: boolean,
  *     isRejected: boolean,
  *     isFulfilled: boolean,
- *     then: typeof ThenSynthetic;
- *     catch: typeof CatchSynthetic;
- *     finally: typeof FinallySynthetic;
+ *     then: DZThenSynthetic<T>;
+ *     catch: DZCatchSynthetic<T>;
+ *     finally: DZFinallySynthetic<T>;
  * }}
  */
 export const zCreateResolvablePromise = ( name = "", autoThrow = true ) => {
@@ -141,3 +145,4 @@ export const zCreateResolvablePromise = ( name = "", autoThrow = true ) => {
 
     return result;
 };
+

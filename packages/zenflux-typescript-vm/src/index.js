@@ -16,6 +16,9 @@ import { zCreateResolvablePromise } from "@zenflux/utils/src/promise";
 
 import { defineConfig, externalConfig, waitForConfig } from "./config.js";
 
+import memoryVerbose from "./memory-verbose.js";
+import { auto } from "./auto.js";
+
 export { Resolvers } from "./resolvers.js";
 export { Loaders } from "./loaders.js";
 
@@ -71,6 +74,8 @@ const initialize = async () => {
         extensions: externalConfig.extensions,
 
         vmModuleEvaluateOptions: externalConfig.vmModuleEvaluateOptions,
+
+        moduleTransformers: externalConfig.moduleTransformers,
     };
 
     // TODO: Find better solution.
@@ -80,7 +85,18 @@ const initialize = async () => {
     let tsConfig;
     let tsNodeProvider, swcProvider;
 
-    if ( externalConfig.useTsNode ) {
+    if ( "swc" === externalConfig.useCompiler ) {
+        swcProvider =
+            new ( ( await import( "./providers/swc-provider.js" ) ).SwcProvider )( {
+                tsConfigPath: config.paths.tsConfigPath,
+                tsConfigReadCallback: externalConfig.tsConfigVerbose
+            } );
+
+        swcProvider.initialize();
+
+        tsConfig = swcProvider.tsConfig;
+
+    } else if ( "ts-node" === externalConfig.useCompiler ) {
         tsNodeProvider =
             new ( ( await import( "./providers/ts-node-provider.js" ) ).TsNodeProvider )( {
                 skipInitialize: true,
@@ -92,16 +108,6 @@ const initialize = async () => {
         tsNodeProvider.initialize();
 
         tsConfig = tsNodeProvider.service.config;
-    } else if ( externalConfig.useSwc ) {
-        swcProvider =
-            new ( ( await import( "./providers/swc-provider.js" ) ).SwcProvider )( {
-                tsConfigPath: config.paths.tsConfigPath,
-                tsConfigReadCallback: externalConfig.tsConfigVerbose
-            } );
-
-        swcProvider.initialize();
-
-        tsConfig = swcProvider.tsConfig;
     }
 
     /**
@@ -153,10 +159,10 @@ const initialize = async () => {
         } ) );
     }
 
-    if ( externalConfig.useTsNode ) {
-        providers.push( tsNodeProvider );
-    } else if ( externalConfig.useSwc ) {
+    if ( "swc" === externalConfig.useCompiler ) {
         providers.push( swcProvider );
+    } else if ( "ts-node" === externalConfig.useCompiler ) {
+        providers.push( tsNodeProvider );
     }
 
     // Other no resolvers providers, order is not important.
@@ -171,120 +177,74 @@ const initialize = async () => {
         context: createContext( externalConfig.vmContext, externalConfig.vmContextOptions ),
     };
 
-    /**
-     * @param {string} entrypointPath
-     * @param {Loaders} loaders
-     * @param {Resolvers} resolvers
-     */
-    function auto( entrypointPath, loaders, resolvers ) {
-        const argIndex = process.argv.findIndex( a => a === "--zvm-memory-verbose" );
-
-        if  ( argIndex !== -1 ) {
-            let mode = process.argv[ argIndex + 1 ];
-
-            switch( mode ) {
-                case "isolated": {
-                    mode = "summary"
-                }
-                break;
-
-                default:
-                case "total":
-                    mode = "detailed";
-                    break;
-            }
-
-            const printMemoryUsage = () =>{
-                /**
-                 * @typedef {ReturnType<typeof import("node:vm").measureMemory>} ResultPromise
-                 */
-                measureMemory( {
-                    mode,
-                    execution: "eager"
-                } ).then( ( result ) => {
-                    /**
-                     * @type {Awaited<ResultPromise>}
-                     */
-                    const usage = result;
-
-                    // Convert to MB.
-                    const formated  = {
-                        estimate: ( Math.round( usage.total.jsMemoryEstimate / 1024 / 1024 * 100 ) / 100  ) + "MB",
-                        low: ( Math.round( usage.total.jsMemoryRange[ 0 ] / 1024 / 1024 * 100 ) / 100  ) + "MB",
-                        high: ( Math.round( usage.total.jsMemoryRange[ 1 ] / 1024 / 1024 * 100 ) / 100  ) + "MB",
-                    };
-
-                    console.log( "--zvm-memory-verbose with mode:", mode, util.inspect( formated ) );
-                } );
-            };
-
-            printMemoryUsage();
-
-            setInterval( printMemoryUsage, mode === "summary" ? 10000 : 1000 );
-        }
-
-        // defer to next tick, allow to load all providers.
-        return new Promise( ( resolve, reject ) => {
-            setTimeout( () => {
-                async function linker( modulePath, referencingModule ) {
-                    const result = await resolvers.try( modulePath, referencingModule ).resolve()
-                        .catch( ( error ) => /* Lazy... but works */ referencingModule = error.referencingModule );
-
-                    if ( result.provider ) {
-                        let type,
-                            modulePath;
-
-                        switch ( result.provider.name ) {
-                            case "node":
-                                // TODO If file includes "." dot
-                                if ( path.extname( result.resolvedPath ) === ".json" ) {
-                                    type = "json";
-                                    modulePath = result.resolvedPath;
-
-                                    break;
-                                }
-                                if ( path.extname( result.resolvedPath ) === ".ts" ) {
-                                    type = "esm";
-                                    modulePath = result.resolvedPath;
-                                    break;
-                                }
-                                type = "node";
-                                modulePath = result.modulePath;
-                                break;
-
-                            case "workspace":
-                            case "relative":
-                            case "ts-paths":
-                            case "tsnode-esm":
-                            case "swc":
-                                modulePath = result.resolvedPath;
-
-                                if ( path.extname( result.resolvedPath ) === ".json" ) {
-                                    type = "json";
-                                    break;
-                                }
-
-                                type = "esm";
-                                break;
-
-                            default:
-                                throw new Error( `Unknown provider: ${ util.inspect( result.provider.name ) }`, {
-                                    cause: result
-                                } );
-                        }
-
-                        return loaders.loadModule( modulePath, type, referencingModule,linker );
-                    }
-
-                    throw new Error( `Module not found: ${ util.inspect( modulePath ) } referer ${ util.inspect( "file://" + referencingModule.identifier ) }` );
-                }
-
-                loaders.loadModule( entrypointPath, "esm", null , linker )
-                    .then( resolve )
-                    .catch( reject );
-            } );
-        } );
-    }
+    // /**
+    //  * @param {string} entrypointPath
+    //  * @param {Loaders} loaders
+    //  * @param {Resolvers} resolvers
+    //  */
+    // function auto( entrypointPath, loaders, resolvers ) {
+    //     // defer to next tick, allow to load all providers.
+    //     return new Promise( ( resolve, reject ) => {
+    //         setTimeout( () => {
+    //             async function linker( modulePath, referencingModule ) {
+    //                 const result = await resolvers.try( modulePath, referencingModule ).resolve()
+    //                     .catch( ( error ) => /* Lazy... but works */ referencingModule = error.referencingModule );
+    //
+    //                 if ( result.provider ) {
+    //                     let type,
+    //                         modulePath;
+    //
+    //                     switch ( result.provider.name ) {
+    //                         case "node":
+    //                             // TODO If file includes "." dot
+    //                             if ( path.extname( result.resolvedPath ) === ".json" ) {
+    //                                 type = "json";
+    //                                 modulePath = result.resolvedPath;
+    //
+    //                                 break;
+    //                             }
+    //                             if ( path.extname( result.resolvedPath ) === ".ts" ) {
+    //                                 type = "esm";
+    //                                 modulePath = result.resolvedPath;
+    //                                 break;
+    //                             }
+    //                             type = "node";
+    //                             modulePath = result.modulePath;
+    //                             break;
+    //
+    //                         case "workspace":
+    //                         case "relative":
+    //                         case "ts-paths":
+    //                         case "tsnode-esm":
+    //                         case "swc":
+    //                             modulePath = result.resolvedPath;
+    //
+    //                             if ( path.extname( result.resolvedPath ) === ".json" ) {
+    //                                 type = "json";
+    //                                 break;
+    //                             }
+    //
+    //                             type = "esm";
+    //                             break;
+    //
+    //                         default:
+    //                             throw new Error( `Unknown provider: ${ util.inspect( result.provider.name ) }`, {
+    //                                 cause: result
+    //                             } );
+    //                     }
+    //
+    //                     return loaders.loadModule( modulePath, type, referencingModule,linker );
+    //                 }
+    //
+    //                 throw new Error( `Module not found: ${ util.inspect( modulePath ) } referer ${ util.inspect( "file://" + referencingModule.identifier ) }` );
+    //             }
+    //
+    //             loaders.loadModule( entrypointPath, "esm", null , linker )
+    //                 .then( resolve )
+    //                 .catch( reject );
+    //         } );
+    //     } );
+    // }
 
     return {
         config,
@@ -316,3 +276,5 @@ initialize()
     .then( vmLoaded => Object.assign( vm, vmLoaded ) )
     .then( initializePromise.resolve );
 
+
+memoryVerbose();

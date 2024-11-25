@@ -1,0 +1,43 @@
+.navbar {
+    height: 60px;
+    border-bottom: 1px solid #ccc;
+
+    @apply shadow-md;
+
+    @apply bg-gray-50;
+}
+
+
+.navbar nav {
+    @apply flex;
+    @apply items-center;
+    @apply justify-between;
+    @apply h-full;
+    @apply px-4;
+    @apply container;
+    @apply mx-auto;
+}
+
+.navbar .navbar__brand {
+    @apply text-2xl;
+    @apply font-bold;
+    @apply text-gray-700;
+
+    @apply select-none;
+    @apply cursor-pointer;
+
+    h1 {
+        @apply transition-all duration-300;
+
+        &:hover {
+            @apply text-gray-950;
+            @apply font-extrabold;
+        }
+    }
+}
+
+.navbar .navbar__end {
+    max-width: 40px;
+    max-height: 40px;
+}
+

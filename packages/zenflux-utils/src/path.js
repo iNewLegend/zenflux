@@ -38,7 +38,9 @@ export const zGetMatchingPathsRecursive = async (
         /**
          * @type {import("fs").Dirent[]}
          */
-        const filesInDirectory = await fsPromises.readdir( directory, { withFileTypes: true } );
+        const filesInDirectory = await fsPromises.readdir( directory, { withFileTypes: true } )
+            .then( files => files )
+            .catch( () => [] );
 
         await Promise.all( filesInDirectory.map( async dirent => {
             const filePath = join( directory, dirent.name );

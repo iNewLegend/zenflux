@@ -4,12 +4,9 @@
     "scripts": {
         "demo-app:dev": "vite",
         "demo-app:build": "vite build",
-        "demo-app:lint": "eslint --config eslint.config.js --report-unused-disable-directives --max-warnings 0 .",
+        "demo-app:lint": "eslint --report-unused-disable-directives --max-warnings 0 .",
         "demo-app:preview": "vite preview",
         "demo-app:clean": "vite clean"
-    },
-    "peerDependencies": {
-        "typescript": "^5.0.0"
     },
     "dependencies": {
         "@nextui-org/button": "^2.0.26",
